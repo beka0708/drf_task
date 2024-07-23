@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: '${NAME_DB}'
+      POSTGRES_USER: '${USER_DB}'
+      POSTGRES_PASSWORD: '${PASSWORD_DB}'
+      TZ: Asia/Bishkek
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: >
+      bash -c "python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8001:8000"
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+        - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
